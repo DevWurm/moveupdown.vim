@@ -58,6 +58,13 @@ function! MoveUpDownRange(rangeBeginning, rangeEnd, targetLine)
     " move to target line and insert content
     execute "normal! " . a:targetLine . "gg\"qP"
 
+    " print status message
+    if (a:rangeEnd - a:rangeBeginning) == 0
+        echom "1 line moved"
+    else
+        echom (a:rangeEnd - a:rangeBeginning + 1) . " lines moved"
+    endif
+
     " restore content of working register
     let @q = registerContent
 endfunction
