@@ -1,32 +1,62 @@
 function! MoveUpDownToTargetLine(type)
-    let movementBeginning =  line("'[")
-    let movementEnd =  line("']")
+    let rangeBeginning = w:invokationLine
+    let rangeEnd = w:invokationLine
+    let motionBeginning =  line("'[")
+    let motionEnd =  line("']")
 
-    execute "normal! " . w:invokationLine . "gg\"qdd"
-
-    if w:invokationLine == movementBeginning
-        execute "normal! " . movementEnd . "gg\"qP"
+    " test if the motion was upwards (end of motion range is in the invokation
+    " line) or not and set the corresponding target line
+    if w:invokationLine == motionBeginning
+        let targetLine = motionEnd
     else
-        execute "normal! " . movementBeginning  . "gg\"qP"
+        let targetLine = motionBeginning
     endif
+
+    " execute the movement
+    call MoveUpDownRange(rangeBeginning, rangeEnd, targetLine)
+
+    " unlet the global invokationLine variable after the movement
+    unlet w:invokationLine
 endfunction
 
 function! MoveUpDownToTargetVisual(type)
     let rangeBeginning = line("'<")
     let rangeEnd = line("'>")
-    let movementBeginning = line("'[")
-    let movementEnd = line("']")
+    let motionBeginning = line("'[")
+    let motionEnd = line("']")
 
-    execute rangeBeginning . "," . rangeEnd . "d q"
-
-    if w:invokationLine == movementBeginning
-        let relativeMovement = movementEnd - w:invokationLine
+    " test if the motion was upwards (end of motion range is in the invokation
+    " line) or not and determine the relative movment of the provided motion
+    if w:invokationLine == motionBeginning
+        let relativeMovement = motionEnd - w:invokationLine
     else
-        let relativeMovement = movementBeginning - w:invokationLine
+        let relativeMovement = motionBeginning - w:invokationLine
     endif
 
+    " calculate the target line of the movement by adding the relative
+    " movement onto the beginning of the selected range
     let targetLine = rangeBeginning + relativeMovement
-    execute "normal! " . targetLine . "gg\"qP"
+
+    " execute the movement
+    call MoveUpDownRange(rangeBeginning, rangeEnd, targetLine)
+
+    " unlet the global invokationLine variable after the movement
+    unlet w:invokationLine
+endfunction
+
+function! MoveUpDownRange(rangeBeginning, rangeEnd, targetLine)
+    "store current content of working register into variable to restore it
+    "later
+    let registerContent = @q
+
+    " delete given range
+    execute a:rangeBeginning . "," . a:rangeEnd . "d q"
+
+    " move to target line and insert content
+    execute "normal! " . a:targetLine . "gg\"qP"
+
+    " restore content of working register
+    let @q = registerContent
 endfunction
 
 nnoremap M :set opfunc=MoveUpDownToTargetLine<CR>:let w:invokationLine = line(".")<CR>g@
