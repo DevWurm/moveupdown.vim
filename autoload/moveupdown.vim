@@ -13,7 +13,7 @@ function! moveupdown#MoveLine(type)
     endif
 
     " execute the movement
-    call MoveUpDownRange(rangeBeginning, rangeEnd, targetLine)
+    call moveupdown#MoveRange(rangeBeginning, rangeEnd, targetLine)
 
     " unlet the global invokationLine variable after the movement
     unlet w:invokationLine
