@@ -1,36 +1,33 @@
 function! MoveUpDownToTargetLine(type)
-    let target = line("'q")
-    let beginning =  line("'[")
-    let end =  line("']")
+    let movementBeginning =  line("'[")
+    let movementEnd =  line("']")
 
-    execute "normal! " . target . "gg\"qdd"
+    execute "normal! " . w:invokationLine . "gg\"qdd"
 
-    if target == beginning
-        execute "normal! " . end . "gg\"qP"
+    if w:invokationLine == movementBeginning
+        execute "normal! " . movementEnd . "gg\"qP"
     else
-        execute "normal! " . beginning  . "gg\"qP"
+        execute "normal! " . movementBeginning  . "gg\"qP"
     endif
 endfunction
 
 function! MoveUpDownToTargetVisual(type)
     let rangeBeginning = line("'<")
     let rangeEnd = line("'>")
-    let target = line("'q")
-    let beginning =  line("'[")
-    let end =  line("']")
+    let movementBeginning = line("'[")
+    let movementEnd = line("']")
 
     execute rangeBeginning . "," . rangeEnd . "d q"
 
-    if target == beginning
-        let relativeMovement = end - target
-        let targetLine = rangeBeginning + relativeMovement
-        execute "normal! " . targetLine . "gg\"qP"
+    if w:invokationLine == movementBeginning
+        let relativeMovement = movementEnd - w:invokationLine
     else
-        let relativeMovement = beginning - target
-        let targetLine = rangeBeginning + relativeMovement
-        execute "normal! " . targetLine . "gg\"qP"
+        let relativeMovement = movementBeginning - w:invokationLine
     endif
+
+    let targetLine = rangeBeginning + relativeMovement
+    execute "normal! " . targetLine . "gg\"qP"
 endfunction
 
-nnoremap M mq:set opfunc=MoveUpDownToTargetLine<CR>g@
-vnoremap M :<C-u>set opfunc=MoveUpDownToTargetVisual<CR>mqg@
+nnoremap M :set opfunc=MoveUpDownToTargetLine<CR>:let w:invokationLine = line(".")<CR>g@
+vnoremap M :<C-u>set opfunc=MoveUpDownToTargetVisual<CR>:let w:invokationLine = line(".")<CR>g@
