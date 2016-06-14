@@ -40,6 +40,9 @@ function! MoveUpDownToTargetVisual(type)
     " execute the movement
     call MoveUpDownRange(rangeBeginning, rangeEnd, targetLine)
 
+    " restore selection
+    execute "normal! " . targetLine . "gg" . visualmode() . (rangeEnd - rangeBeginning) . "j"
+
     " unlet the global invokationLine variable after the movement
     unlet w:invokationLine
 endfunction
